@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS traffic_events (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    event_type VARCHAR(255) NOT NULL,
+    event_time TIMESTAMP NOT NULL
+);
