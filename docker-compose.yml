@@ -1,111 +1,132 @@
 version: "3.9"
 
 services:
-   mysql:
-      image: mysql:8.0
+   mongodb:
+      image: mongo:8.0
       container_name: db
       restart: always
       environment:
-         MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-         MYSQL_DATABASE: ${MYSQL_DATABASE}
-         MYSQL_USER: ${MYSQL_USER}
-         MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+         MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+         MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+         MONGO_INITDB_DATABASE: ${MONGO_DB}
       ports:
-         - "3306:3306"
+         - "27017:27017"
       volumes:
-         - db_data:/var/lib/mysql
-         # Copying all files from db_init folder to the container in the /docker-entrypoint-initdb.d directory
-         - ./db_init:/docker-entrypoint-initdb.d
+         - db_data:/data/db
       networks:
          - netuworku
+      healthcheck:
+         test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/27017"]
+         interval: 10s
+         timeout: 5s
+         retries: 5
+
    scraper:
       build: ./scraper
       container_name: scraper
       depends_on:
-         - mysql
-
-      # Passing environment variables to the container
+         mongodb:
+            condition: service_healthy
       environment:
-         - DB_HOST=mysql
-         - DB_USER=${MYSQL_USER}
-         - DB_PASSWORD=${MYSQL_PASSWORD}
-         - DB_NAME=${MYSQL_DATABASE}
+         - MONGO_HOST=mongodb
+         - MONGO_PORT=${MONGO_PORT}
+         - MONGO_DB=${MONGO_DB}
+         - MONGO_USER=${MONGO_USERNAME}
+         - MONGO_PASSWORD=${MONGO_PASSWORD}
+         - MONGO_COLLECTION=${MONGO_COLLECTION}
+      networks:
+         - netuworku
+
+   redis:
+      image: bitnami/redis:latest
+      container_name: redis
+      restart: always
+      environment:
+         - REDIS_PASSWORD=${REDIS_PASSWORD}
+      ports:
+         - "6379:6379"
+      volumes:
+         - redis_data:/bitnami/redis/data
+      networks:
+         - netuworku
+      healthcheck:
+         test: ["CMD", "redis-cli", "-a", "$${REDIS_PASSWORD}", "ping"]
+         interval: 10s
+         timeout: 5s
+         retries: 5
+
+   redisinsight:
+      image: redislabs/redisinsight:latest
+      container_name: redisinsight
+      restart: always
+      ports:
+         - "5540:5540"
+      networks:
+         - netuworku
+      volumes:
+         - redisinsight_data:/data
+      depends_on:
+         redis:
+            condition: service_healthy
+   server:
+      build: ./server
+      container_name: server
+      restart: unless-stopped
+      depends_on:
+         redis:
+            condition: service_healthy
+         mongodb:
+            condition: service_healthy
+      ports:
+            - "8000:8000"
+      environment:
+         - MONGO_HOST=mongodb
+         - MONGO_PORT=${MONGO_PORT}
+         - MONGO_DB=${MONGO_DB}
+         - MONGO_USER=${MONGO_USERNAME}
+         - MONGO_PASSWORD=${MONGO_PASSWORD}
+         - MONGO_COLLECTION=${MONGO_COLLECTION}
+         
+         - REDIS_HOST=${REDIS_HOST}
+         - REDIS_PORT=${REDIS_PORT}
+         - REDIS_PASSWORD=${REDIS_PASSWORD}
+
+      healthcheck:
+         test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health').read()"]
+         interval: 10s
+         timeout: 5s
+         retries: 5
+
+      networks:
+         - netuworku
+
+   alert_generator:
+      build: ./alert_generator
+      container_name: alert_generator
+      restart: unless-stopped
+      depends_on:
+         redis:
+            condition: service_healthy
+         mongodb:
+            condition: service_healthy
+         server: 
+            condition: service_healthy
+      environment:
+         - SERVER_HOST=server
+         - MONGO_HOST=mongodb
+         - MONGO_PORT=${MONGO_PORT}
+         - MONGO_DB=${MONGO_DB}
+         - MONGO_USER=${MONGO_USERNAME}
+         - MONGO_PASSWORD=${MONGO_PASSWORD}
+         - MONGO_COLLECTION=${MONGO_COLLECTION}
       networks:
          - netuworku
 
 volumes:
-   db_data:  # Defining a volume for the MySQL data
+   db_data:
+   redis_data:
+   redisinsight_data:
 
 networks:
    netuworku:
       driver: bridge
-
-
-# version: '3.9'
-
-# services:
-#   mysql:
-#     image: mysql:8.0
-#     container_name: db
-#     restart: always
-#     environment:
-#       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-#       MYSQL_DATABASE: ${MYSQL_DATABASE}
-#       MYSQL_USER: ${MYSQL_USER}
-#       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-#     ports:
-#       - "3306:3306"
-#     volumes:
-#       - ./db:/var/lib/mysql
-#     networks:
-#       - backend
-
-#   redis:
-#     image: redis:latest
-#     container_name: cache
-#     ports:
-#       - "6379:6379"
-#     networks:
-#       - backend
-
-#   scraper:
-#     build: ./scraper
-#     container_name: scraper
-#     depends_on:
-#       - mysql
-#     environment:
-#       - DB_HOST=mysql
-#       - DB_USER=${MYSQL_USER}
-#       - DB_PASSWORD=${MYSQL_PASSWORD}
-#       - DB_NAME=${MYSQL_DATABASE}
-#     networks:
-#       - backend
-
-#   server:
-#     build: ./server
-#     container_name: app_server
-#     depends_on:
-#       - mysql
-#       - redis
-#     environment:
-#       - DB_HOST=mysql
-#       - REDIS_HOST=redis
-#     ports:
-#       - "5000:5000"  # expone la API para recibir tráfico
-#     networks:
-#       - backend
-
-#   traffic_generator:
-#     build: ./traffic_generator
-#     container_name: generator
-#     depends_on:
-#       - server
-#     environment:
-#       - SERVER_URL=http://server:5000
-#       - DB_HOST=mysql
-#     networks:
-#       - backend
-
-# networks:
-#   backend:
-#     driver: bridge
