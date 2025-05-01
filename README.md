@@ -10,14 +10,14 @@ Este es un proyecto para la recolección y consulta de alertas de tráfico en la
 
 ## 📑 Contenidos
 
-- [¿Qué hace este proyecto?](#qué-hace-este-proyecto)
-- [Características principales](#características-principales)
-- [Estructura del repositorio](#estructura-del-repositorio)
-- [Infraestructura (Docker)](#infraestructura)
-- [Instalación y ejecución](#instalación-y-ejecución)
-- [Ejecución de experimentos](#ejecución-de-experimentos)
+- [¿Qué hace este proyecto?](#-que-hace-este-proyecto)
+- [Características principales](#-características-principales)
+- [Estructura del repositorio](#-estructura-del-repositorio)
+- [Infraestructura (Docker)](#%EF%B8%8F-infraestructura)
+- [Instalación y ejecución](#-instalación-y-ejecución)
+- [Ejecución de experimentos](#-ejecución-de-experimentos)
 
-## 🚦 ¿Qué hace este proyecto?
+## 🚦 ¿Que hace este proyecto?
 
 - Divide Santiago en subregiones para realizar múltiples consultas paralelas a la API de Waze.
 - Recolecta alertas de tráfico como accidentes, congestión, cierres, etc.
