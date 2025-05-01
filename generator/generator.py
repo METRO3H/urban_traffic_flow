@@ -1,5 +1,6 @@
 from distribution_by_importance import generate_by_importance
 from distribution_by_reliability import generate_by_reliability
+from mongodb_client import db_collection
 import time
 import requests
 import os
@@ -62,7 +63,7 @@ def importance_loop(experiment_name):
     redis_count = 0
     db_count = 0
     for i in range(NUM_REQUESTS):
-        logger.info(f'[{str(i+1).zfill(len(NUM_REQUESTS))}/{NUM_REQUESTS}] {experiment_name}...')
+        logger.info(f'[{str(i+1).zfill(len(str(NUM_REQUESTS)))}/{NUM_REQUESTS}] {experiment_name}...')
         alert = generate_by_importance()
         if alert:
             uuid = alert["uuid"]
@@ -228,7 +229,16 @@ def run_experiment():
 
 
 if __name__ == "__main__":
-   
-    run_experiment()
+    while True:
+        db_collection_count = db_collection.count_documents({})
+        
+        if db_collection.count_documents({}) > 10000:
+            run_experiment()
+            break
+        
+        run_experiment()
+        
+     
     logger.info("\nExperiments completed.")
     redis_connection.close()
+    db_collection.client.close()
