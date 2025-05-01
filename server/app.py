@@ -37,21 +37,23 @@ redis_connection = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_
 
 app = FastAPI()
 
+redis_count = 0
+db_count = 0
+
 @app.get("/health")
 def read_root():
     return {"status": "ok"}
 
 @app.get("/alert/{uuid}")
 async def get_alert(uuid: str):
+    global redis_count, db_count
     try:
-
         redis_response = redis_connection.get(uuid)
-        
-
         if redis_response:
             alert = loads(redis_response)
-            json_response = dumps(alert)
-            logger.info(f"  ↳ Alert {uuid} found in Redis cache")
+            json_response = dumps({"source": "redis", "data": alert})
+            logger.info(f"      ↳ Alert {uuid} found in Redis cache")
+            redis_count += 1
             return Response(content=json_response, media_type="application/json")
         
         alert = collection.find_one({"uuid": uuid})
@@ -59,10 +61,11 @@ async def get_alert(uuid: str):
         if not alert:
             raise HTTPException(status_code=404, detail="Alert not found")
         
-        json_response = dumps(alert)
-        redis_connection.set(uuid, json_response)
+        json_response = dumps({"source": "mongodb", "data": alert})
+        redis_connection.set(uuid, json_response, ex=3600)
+        db_count += 1
             
-        logger.info(f"  ↳ Alert {uuid} retrieved from MongoDB and cached in Redis")
+        logger.info(f"      ↳ Alert {uuid} retrieved from MongoDB and cached in Redis")
         return Response(content=json_response, media_type="application/json")
     
     except Exception as e:
