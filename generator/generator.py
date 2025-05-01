@@ -62,21 +62,22 @@ def importance_loop(experiment_name):
     redis_count = 0
     db_count = 0
     for i in range(NUM_REQUESTS):
-        logger.info(f'[{i+1}/{NUM_REQUESTS}] {experiment_name}...')
+        logger.info(f'[{str(i+1).zfill(len(NUM_REQUESTS))}/{NUM_REQUESTS}] {experiment_name}...')
         alert = generate_by_importance()
         if alert:
             uuid = alert["uuid"]
-            logger.info(f"  ↳ [{time.strftime('%X')}] UUID={uuid} → {alert}")
+            logger.info(f"     ↳ [Request] {uuid}")
             response_source = send_request(uuid)
             if response_source is None:
-                logger.error(f"  ↳ [{time.strftime('%X')}] No response for UUID={uuid}")
+                logger.error(f"     ↳ [Response] No response for UUID={uuid}")
                 continue
             if response_source == "redis":
                 redis_count += 1
             else:
                 db_count += 1
+            logger.info(f"     ↳ [Response] {response_source}")
         else:
-            logger.info(f"  ↳ [{time.strftime('%X')}] No se encontró un UUID para el tipo de alerta seleccionado.")
+            logger.info(f"     ↳ [Response] No se encontró un UUID para el tipo de alerta seleccionado.")
         
         time.sleep(REQUEST_DELAY)
     
@@ -89,21 +90,23 @@ def reliability_loop(experiment_name):
     db_count = 0
     
     for i in range(NUM_REQUESTS):
-        logger.info(f'[{i+1}/{NUM_REQUESTS}] {experiment_name}...')
+        logger.info(f'[{str(i+1).zfill(len(str(NUM_REQUESTS)))}/{NUM_REQUESTS}] {experiment_name}...')
         alert = generate_by_reliability()
         if alert:
             uuid = alert["uuid"]
-            logger.info(f"  ↳ [{time.strftime('%X')}] UUID={uuid} → {alert}")
+            logger.info(f"     ↳ [Request] {uuid}")
             response_source = send_request(uuid)
             if response_source is None:
-                logger.error(f"  ↳ [{time.strftime('%X')}] No response for UUID={uuid}")
+                logger.error(f"     ↳ [Response] No response for UUID={uuid}")
                 continue
             if response_source == "redis":
                 redis_count += 1
             else:
                 db_count += 1
+            
+            logger.info(f"     ↳ [Response] {response_source}")
         else:
-            logger.info(f"  ↳ [{time.strftime('%X')}] No se encontró un UUID para el tipo de alerta seleccionado.")
+            logger.info(f"     ↳ [Response] No se encontró un UUID para el tipo de alerta seleccionado.")
         
         time.sleep(REQUEST_DELAY)  # Entre 1 y 10 requests por segundo
     
@@ -146,75 +149,78 @@ def run_experiment():
     #----------Redis configuration allkeys-lru and maxmemory 2mb -------------------------------
     redis_connection.flushall()
     
-    redis_connection.config_set('maxmemory', 2 * 1024 * 1024)  # 2 MB
-    redis_connection.config_set('maxmemory-policy', 'allkeys-lru')
+
     
     time.sleep(11)  # Esperar 11 segundos antes de iniciar el experimento
     
     while not verify_redis_config(2 * 1024 * 1024, 'allkeys-lru'):
-        logger.error("Redis configuration not set correctly. Retrying...")
+        logger.info("Setting Redis configuration: maxmemory 2mb and allkeys-lru policy")
+        redis_connection.config_set('maxmemory', 2 * 1024 * 1024)  # 2 MB
+        redis_connection.config_set('maxmemory-policy', 'allkeys-lru')
         time.sleep(1)
         
-    
     logger.info("Starting experiment 1 - reliability with allkeys-lru and maxmemory 2mb")
+    time.sleep(5)  
     reliability_loop("experiment_1_allkeys-lru_2mb_reliability")
     
     logger.info("Starting experiment 2 - importance with allkeys-lru and maxmemory 2mb")
+    time.sleep(5)  
     importance_loop("experiment_2_allkeys-lru_2mb_importance")
     
     redis_connection.flushall()
-    time.sleep(5)
     
     # ----------Redis configuration allkeys-lru and maxmemory 3mb -------------------------------
     
-    redis_connection.config_set('maxmemory', 3 * 1024 * 1024)  # 3 MB
-    redis_connection.config_set('maxmemory-policy', 'allkeys-lru')
     
     while not verify_redis_config(3 * 1024 * 1024, 'allkeys-lru'):
-        logger.error("Redis configuration not set correctly. Retrying...")
+        logger.info("Setting Redis configuration: maxmemory 3mb and allkeys-lru policy")
+        redis_connection.config_set('maxmemory', 3 * 1024 * 1024)  # 3 MB
+        redis_connection.config_set('maxmemory-policy', 'allkeys-lru')
         time.sleep(1)
         
     logger.info("Starting experiment 3 - reliability with allkeys-lru and maxmemory 3mb")
+    time.sleep(5)   
     reliability_loop("experiment_3_allkeys-lru_3mb_reliability")
-        
+    
     logger.info("Starting experiment 4 - importance with allkeys-lru and maxmemory 3mb")
+    time.sleep(5)  
     importance_loop("experiment_4_allkeys-lru_3mb_importance")
         
     redis_connection.flushall()
-    time.sleep(5)
     
-    # Redis configuration allkeys-lfu and maxmemory 1mb
-    
-    
-    redis_connection.config_set('maxmemory', 2 * 1024 * 1024)  # 2 MB
-    redis_connection.config_set('maxmemory-policy', 'allkeys-lfu')
-    
+    # Redis configuration allkeys-lfu and maxmemory 2mb
+
     while not verify_redis_config(2 * 1024 * 1024, 'allkeys-lfu'):
-        logger.error("Redis configuration not set correctly. Retrying...")
+        logger.info("Setting Redis configuration: maxmemory 2mb and allkeys-lfu policy")
+        redis_connection.config_set('maxmemory', 2 * 1024 * 1024)  # 2 MB
+        redis_connection.config_set('maxmemory-policy', 'allkeys-lfu')
         time.sleep(1)
     
     logger.info("Starting experiment 5 - reliability with allkeys-lfu and maxmemory 2mb")
+    time.sleep(5)  
     reliability_loop("experiment_5_allkeys-lfu_2mb_reliability")
     
     logger.info("Starting experiment 6 - importance with allkeys-lfu and maxmemory 2mb")
+    time.sleep(5)  
     importance_loop("experiment_6_allkeys-lfu_2mb_importance")
     
     redis_connection.flushall()
-    time.sleep(5)
     
     # Redis configuration allkeys-lfu and maxmemory 3mb
-    redis_connection.config_set('maxmemory', 3 * 1024 * 1024)  # 3 MB
-    redis_connection.config_set('maxmemory-policy', 'allkeys-lfu')
     
     while not verify_redis_config(3 * 1024 * 1024, 'allkeys-lfu'):
-        logger.error("Redis configuration not set correctly. Retrying...") 
+        logger.info("Setting Redis configuration: maxmemory 3mb and allkeys-lfu policy")
+        redis_connection.config_set('maxmemory', 3 * 1024 * 1024)  # 3 MB
+        redis_connection.config_set('maxmemory-policy', 'allkeys-lfu')
         time.sleep(1)
 
     
     logger.info("Starting experiment 7 - reliability with allkeys-lfu and maxmemory 3mb")
+    time.sleep(5)  
     reliability_loop("experiment_7_allkeys-lfu_3mb_reliability")
     
     logger.info("Starting experiment 8 - importance with allkeys-lfu and maxmemory 3mb")
+    time.sleep(5)  
     importance_loop("experiment_8_allkeys-lfu_3mb_importance")
     
     redis_connection.flushall()
@@ -226,5 +232,3 @@ if __name__ == "__main__":
     run_experiment()
     logger.info("\nExperiments completed.")
     redis_connection.close()
-    
-    
