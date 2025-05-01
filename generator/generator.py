@@ -137,14 +137,14 @@ def run_experiment():
     
     
     """
-    Experimento 1: Configuración de Redis con maxmemory 2mb, política allkeys-lru y distribución por fiabilidad
-    Experimento 2: Configuración de Redis con maxmemory 2mb, política allkeys-lru y distribución por importancia
-    Experimento 3: Configuración de Redis con maxmemory 3mb, política allkeys-lru y distribución por fiabilidad
-    Experimento 4: Configuración de Redis con maxmemory 3mb, política allkeys-lru y distribución por importancia
-    Experimento 5: Configuración de Redis con maxmemory 2mb, política allkeys-lfu y distribución por fiabilidad
-    Experimento 6: Configuración de Redis con maxmemory 2mb, política allkeys-lfu y distribución por importancia
-    Experimento 7: Configuración de Redis con maxmemory 3mb, política allkeys-lfu y distribución por fiabilidad
-    Experimento 8: Configuración de Redis con maxmemory 3mb, política allkeys-lfu y distribución por importancia
+- Experimento 1: Distribución por fiabilidad y Configuración de Redis con maxmemory 2mb, política allkeys-lru
+- Experimento 2: Distribución por importancia y Configuración de Redis con maxmemory 2mb, política allkeys-lru
+- Experimento 3: Distribución por fiabilidad y Configuración de Redis con maxmemory 3mb, política allkeys-lru
+- Experimento 4: Distribución por importancia y Configuración de Redis con maxmemory 3mb, política allkeys-lru
+- Experimento 5: Distribución por fiabilidad y Configuración de Redis con maxmemory 2mb, política allkeys-lfu
+- Experimento 6: Distribución por importancia y Configuración de Redis con maxmemory 2mb, política allkeys-lfu
+- Experimento 7: Distribución por fiabilidad y Configuración de Redis con maxmemory 3mb, política allkeys-lfu
+- Experimento 8: Distribución por importancia y Configuración de Redis con maxmemory 3mb, política allkeys-lfu
     """
     
     #----------Redis configuration allkeys-lru and maxmemory 2mb -------------------------------
@@ -242,15 +242,3 @@ if __name__ == "__main__":
     logger.info("\nExperiments completed.")
     redis_connection.close()
     close_mongo_client()
-    
-
-"""
-- Experimento 1: Distribución por fiabilidad y Configuración de Redis con maxmemory 2mb, política allkeys-lru
-- Experimento 2: Distribución por importancia y Configuración de Redis con maxmemory 2mb, política allkeys-lru
-- Experimento 3: Distribución por fiabilidad y Configuración de Redis con maxmemory 3mb, política allkeys-lru
-- Experimento 4: Distribución por importancia y Configuración de Redis con maxmemory 3mb, política allkeys-lru
-- Experimento 5: Distribución por fiabilidad y Configuración de Redis con maxmemory 2mb, política allkeys-lfu
-- Experimento 6: Distribución por importancia y Configuración de Redis con maxmemory 2mb, política allkeys-lfu
-- Experimento 7: Distribución por fiabilidad y Configuración de Redis con maxmemory 3mb, política allkeys-lfu
-- Experimento 8: Distribución por importancia y Configuración de Redis con maxmemory 3mb, política allkeys-lfu
-"""
