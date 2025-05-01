@@ -1,6 +1,6 @@
 from distribution_by_importance import generate_by_importance
 from distribution_by_reliability import generate_by_reliability
-from mongodb_client import db_collection
+from mongodb_client import db_collection, close_mongo_client
 import time
 import requests
 import os
@@ -241,4 +241,16 @@ if __name__ == "__main__":
      
     logger.info("\nExperiments completed.")
     redis_connection.close()
-    db_collection.client.close()
+    close_mongo_client()
+    
+
+"""
+- Experimento 1: Distribución por fiabilidad y Configuración de Redis con maxmemory 2mb, política allkeys-lru
+- Experimento 2: Distribución por importancia y Configuración de Redis con maxmemory 2mb, política allkeys-lru
+- Experimento 3: Distribución por fiabilidad y Configuración de Redis con maxmemory 3mb, política allkeys-lru
+- Experimento 4: Distribución por importancia y Configuración de Redis con maxmemory 3mb, política allkeys-lru
+- Experimento 5: Distribución por fiabilidad y Configuración de Redis con maxmemory 2mb, política allkeys-lfu
+- Experimento 6: Distribución por importancia y Configuración de Redis con maxmemory 2mb, política allkeys-lfu
+- Experimento 7: Distribución por fiabilidad y Configuración de Redis con maxmemory 3mb, política allkeys-lfu
+- Experimento 8: Distribución por importancia y Configuración de Redis con maxmemory 3mb, política allkeys-lfu
+"""

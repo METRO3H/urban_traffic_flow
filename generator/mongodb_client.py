@@ -19,3 +19,12 @@ client = MongoClient(mongo_uri)
 db = client[MONGO_DB]
 
 db_collection = db[MONGO_COLLECTION]
+
+def close_mongo_client():
+    """
+    Cierra la conexión con el cliente de MongoDB.
+    """
+    if client:
+        
+        client.close()
+        print("Conexión con MongoDB cerrada.")
