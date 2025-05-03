@@ -257,7 +257,7 @@ docker-compose up --build
 4. Accede a los servicios disponibles
 
 - [http://localhost:8000/docs](http://localhost:8000/docs) – Interfaz interactiva de la API (Swagger UI).
-- [http://localhost:5540/](http://localhost:5540/) – Interfaz web de Redis (por ejemplo, Redis Commander, si está habilitada).
+- [http://localhost:5540/](http://localhost:5540/) – Interfaz web de Redis.
 
 5. Ejemplo de consulta de una alerta por UUID
 
