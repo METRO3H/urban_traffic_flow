@@ -10,12 +10,16 @@ Este es un proyecto para la recolección y consulta de alertas de tráfico en la
 
 ## 📑 Contenidos
 
-- [¿Qué hace este proyecto?](#-que-hace-este-proyecto)
-- [Características principales](#-características-principales)
-- [Estructura del repositorio](#-estructura-del-repositorio)
-- [Infraestructura (Docker)](#%EF%B8%8F-infraestructura)
-- [Instalación y ejecución](#-instalación-y-ejecución)
-- [Ejecución de experimentos](#-ejecución-de-experimentos)
+- [Tarea 1 - Sistemas Distribuidos | Plataforma de Análisis de Tráfico en Región Metropolitana](#tarea-1---sistemas-distribuidos--plataforma-de-análisis-de-tráfico-en-región-metropolitana)
+  - [📑 Contenidos](#-contenidos)
+  - [🚦 ¿Que hace este proyecto?](#-que-hace-este-proyecto)
+  - [📖 Características principales](#-características-principales)
+  - [📁 Estructura del repositorio](#-estructura-del-repositorio)
+  - [🛠️ Infraestructura](#️-infraestructura)
+  - [🚀 Instalación y ejecución](#-instalación-y-ejecución)
+  - [🧪 Ejecución de experimentos](#-ejecución-de-experimentos)
+  - [📌 Notas adicionales](#-notas-adicionales)
+  - [👨‍💻 Autor](#-autor)
 
 ## 🚦 ¿Que hace este proyecto?
 
@@ -240,12 +244,12 @@ cd urban_traffic_flow
 MONGO_DB=waze_data
 MONGO_PORT=27017
 MONGO_USERNAME=BOB
-MONGO_PASSWORD=4E84BFA550BC933305FCAA01FAEE76E87597DA7F0914E44D2C3DA50C2C633279
+MONGO_PASSWORD=mongo_pass_here...
 MONGO_COLLECTION=urban_alerts
 
 REDIS_HOST=redis
 REDIS_PORT=6379
-REDIS_PASSWORD=4E84BFA550LQ933305FXAA01FAEE76E52597DA7F0914E44D2C3DA50C2C633279
+REDIS_PASSWORD=redis_pass_here...
 ```
 
 3. Levanta los servicios con Docker Compose:
