@@ -1,4 +1,4 @@
-# Tarea 1 - Sistemas Distribuidos | Plataforma de Análisis de Tráfico en Región Metropolitana
+# Plataforma de Análisis de Tráfico en Región Metropolitana
 ![Docker](https://img.shields.io/badge/docker-ready-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-async-lightgreen)
 ![Redis](https://img.shields.io/badge/redis-caching-red)
