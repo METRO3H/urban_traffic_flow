@@ -10,7 +10,7 @@ Este es un proyecto para la recolección y consulta de alertas de tráfico en la
 
 ## 📑 Contenidos
 
-- [Tarea 1 - Sistemas Distribuidos | Plataforma de Análisis de Tráfico en Región Metropolitana](#tarea-1---sistemas-distribuidos--plataforma-de-análisis-de-tráfico-en-región-metropolitana)
+- [Plataforma de Análisis de Tráfico en Región Metropolitana](#tarea-1---sistemas-distribuidos--plataforma-de-análisis-de-tráfico-en-región-metropolitana)
   - [📑 Contenidos](#-contenidos)
   - [🚦 ¿Que hace este proyecto?](#-que-hace-este-proyecto)
   - [📖 Características principales](#-características-principales)
